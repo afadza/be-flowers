@@ -27,36 +27,65 @@ export default new (class CustomerServices {
 
   async create(req: Request, res: Response) {
     try {
-      const customer = this.customerRepository.create(req.body);
+      const { name, email, password } = req.body;
+  
+      if (!email || !password || !name) { 
+        return res.status(400).json({ message: "Please provide email, password, and name" });
+      }
+  
+      const existingCustomer = await this.customerRepository.findOne({
+        where: { email: email },
+      });
+  
+      if (existingCustomer) {
+        return res.status(400).json({ message: "Email already exists" });
+      }
+  
+      const data = { name, email, password };
+      const customer = this.customerRepository.create(data);
       await this.customerRepository.save(customer);
       return res.status(200).json(customer);
     } catch (error) {
       return res.status(500).json(error);
     }
   }
+  
 
   async update(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const id = res.locals.loginSession.customer.id;
+      const { email } = req.body;
+  
       const customer = await this.customerRepository.findOne({
         where: { id: id },
       });
-      if (customer) {
-        this.customerRepository.merge(customer, req.body);
-        await this.customerRepository.save(customer);
-        return res.status(200).json({
-          message: "Customer updated",
-          customer: customer,
-        });
-      } else {
-        return res.status(404).json({
-          message: "Customer not found",
-        });
+  
+      if (!customer) {
+        return res.status(404).json({ message: "Customer not found" });
       }
+  
+      if (email && email !== customer.email) {
+        const existingCustomer = await this.customerRepository.findOne({
+          where: { email: email },
+        });
+  
+        if (existingCustomer) {
+          return res.status(400).json({ message: "Email already exists" });
+        }
+      }
+  
+      this.customerRepository.merge(customer, req.body);
+      await this.customerRepository.save(customer);
+      
+      return res.status(200).json({
+        message: "Customer updated",
+        customer: customer,
+      });
     } catch (error) {
       return res.status(500).json(error);
     }
   }
+  
 
   async login(req: Request, res: Response) {
     try {
@@ -66,7 +95,7 @@ export default new (class CustomerServices {
       });
       if (customer && customer.password === password) {
         const token = jwt.sign({ customer: customer }, "secret", {
-          expiresIn: "1h",
+          expiresIn: "30d",
         });
         return res
           .status(200)
