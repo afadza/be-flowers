@@ -32,6 +32,6 @@ router.post(
   AuthenticationMiddlewares.Authentication,
   CartController.create
 );
-router.delete("/cart/:id", CartController.delete);
+router.delete("/cart", CartController.delete);
 
 export default router;

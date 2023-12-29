@@ -14,7 +14,7 @@ export default new (class CartServices {
   async find(req: Request, res: Response) {
     try {
       const carts = await this.cartRepository.find({
-        relations: ["customer", "product"]
+        relations: ["customer", "product"],
       });
       return res.status(200).json(carts);
     } catch (error) {
@@ -58,23 +58,47 @@ export default new (class CartServices {
 
   async delete(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
-      const cart = await this.cartRepository.findOne({
-        where: { id: id },
-      });
-      if (cart) {
-        await this.cartRepository.remove(cart);
-        return res.status(200).json({
-          message: "Keranjang berhasil dihapus",
-          cart: cart,
-        });
-      } else {
+      const cartIds: number[] = req.body.cartIds;
+      const cartsToDelete: Cart[] = await this.cartRepository.findByIds(
+        cartIds
+      );
+
+      if (cartsToDelete.length === 0) {
         return res.status(404).json({
           message: "Keranjang tidak ditemukan",
         });
       }
+
+      await this.cartRepository.remove(cartsToDelete);
+
+      return res.status(200).json({
+        message: "Keranjang berhasil dihapus",
+        carts: cartsToDelete,
+      });
     } catch (error) {
       return res.status(500).json(error);
     }
   }
+
+  // async delete(req: Request, res: Response) {
+  //   try {
+  //     const id = Number(req.params.id);
+  //     const cart = await this.cartRepository.findOne({
+  //       where: { id: id },
+  //     });
+  //     if (cart) {
+  //       await this.cartRepository.remove(cart);
+  //       return res.status(200).json({
+  //         message: "Keranjang berhasil dihapus",
+  //         cart: cart,
+  //       });
+  //     } else {
+  //       return res.status(404).json({
+  //         message: "Keranjang tidak ditemukan",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     return res.status(500).json(error);
+  //   }
+  // }
 })();
