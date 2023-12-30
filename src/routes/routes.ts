@@ -32,6 +32,7 @@ router.post(
   AuthenticationMiddlewares.Authentication,
   CartController.create
 );
+router.patch("/cart", CartController.checkout);
 router.delete("/cart", CartController.delete);
 
 export default router;

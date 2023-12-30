@@ -10,6 +10,10 @@ export default new (class CartController {
     CartServices.create(req, res);
   }
 
+  checkout(req: Request, res: Response) {
+    CartServices.checkout(req, res);
+  }
+
   delete(req: Request, res: Response) {
     CartServices.delete(req, res);
   }

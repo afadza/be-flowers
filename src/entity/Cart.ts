@@ -13,6 +13,9 @@ export class Cart {
   @ManyToOne(() => Product, (product) => product.carts)
   product: Product;
 
+  @Column({ default: false })
+  checkout: boolean;
+
   @Column()
   quantity: number;
 

@@ -56,9 +56,42 @@ export default new (class CartServices {
     }
   }
 
+  async checkout(req: Request, res: Response) {
+    try {
+      const cartIds: number[] = req.body.cartIds;
+
+      const cartsToCheckout: Cart[] = await this.cartRepository.findByIds(
+        cartIds
+      );
+
+      if (cartsToCheckout.length === 0) {
+        return res.status(404).json({
+          message: "Keranjang tidak ditemukan",
+        });
+      }
+
+      cartsToCheckout.forEach((cart) => {
+        cart.checkout = true;
+      });
+      
+      await this.cartRepository.save(cartsToCheckout);
+
+      return res.status(200).json({
+        message: "Keranjang berhasil checkout",
+        carts: cartsToCheckout,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: error,
+        message: "Terjadi kesalahan saat melakukan checkout",
+      });
+    }
+  }
+
   async delete(req: Request, res: Response) {
     try {
       const cartIds: number[] = req.body.cartIds;
+
       const cartsToDelete: Cart[] = await this.cartRepository.findByIds(
         cartIds
       );
@@ -76,29 +109,11 @@ export default new (class CartServices {
         carts: cartsToDelete,
       });
     } catch (error) {
-      return res.status(500).json(error);
+      return res.status(500).json({
+        error: error,
+        message: "Terjadi kesalahan saat menghapus keranjang",
+      });
     }
   }
 
-  // async delete(req: Request, res: Response) {
-  //   try {
-  //     const id = Number(req.params.id);
-  //     const cart = await this.cartRepository.findOne({
-  //       where: { id: id },
-  //     });
-  //     if (cart) {
-  //       await this.cartRepository.remove(cart);
-  //       return res.status(200).json({
-  //         message: "Keranjang berhasil dihapus",
-  //         cart: cart,
-  //       });
-  //     } else {
-  //       return res.status(404).json({
-  //         message: "Keranjang tidak ditemukan",
-  //       });
-  //     }
-  //   } catch (error) {
-  //     return res.status(500).json(error);
-  //   }
-  // }
 })();
