@@ -13,6 +13,9 @@ export default new (class CartController {
   checkout(req: Request, res: Response) {
     CartServices.checkout(req, res);
   }
+  deliver(req: Request, res: Response) {
+    CartServices.delivered(req, res);
+  }
 
   delete(req: Request, res: Response) {
     CartServices.delete(req, res);

@@ -16,6 +16,9 @@ export class Cart {
   @Column({ default: false })
   checkout: boolean;
 
+  @Column({ default: false })
+  delivered: boolean;
+
   @Column()
   quantity: number;
 
@@ -24,4 +27,7 @@ export class Cart {
 
   @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
   createdAt: Date;
+  
+  @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
+  updatedAt: Date;
 }

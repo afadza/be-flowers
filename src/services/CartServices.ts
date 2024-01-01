@@ -15,6 +15,7 @@ export default new (class CartServices {
     try {
       const carts = await this.cartRepository.find({
         relations: ["customer", "product"],
+        order: { updatedAt: "DESC" },
       });
       return res.status(200).json(carts);
     } catch (error) {
@@ -56,6 +57,37 @@ export default new (class CartServices {
     }
   }
 
+  async delivered(req: Request, res: Response) {
+    try {
+      const cartIds: number[] = req.body.cartIds;
+
+      const cartsToDeliver: Cart[] = await this.cartRepository.findByIds(
+        cartIds
+      );
+
+      if (cartsToDeliver.length === 0) {
+        return res.status(404).json({
+          message: "Keranjang tidak ditemukan",
+        });
+      }
+
+      cartsToDeliver.forEach((cart) => {
+        cart.delivered = true;
+      });
+      
+      await this.cartRepository.save(cartsToDeliver);
+
+      return res.status(200).json({
+        message: "Pesanan berhasil dikirim",
+        carts: cartsToDeliver,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: error,
+        message: "Terjadi kesalahan saat melakukan checkout",
+      });
+    }
+  }
   async checkout(req: Request, res: Response) {
     try {
       const cartIds: number[] = req.body.cartIds;

@@ -33,6 +33,7 @@ router.post(
   CartController.create
 );
 router.patch("/cart", CartController.checkout);
+router.patch("/cart/deliver", CartController.deliver);
 router.delete("/cart", CartController.delete);
 
 export default router;
