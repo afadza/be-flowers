@@ -17,6 +17,10 @@ export default new (class CartController {
     CartServices.delivered(req, res);
   }
 
+  received(req: Request, res: Response) {
+    CartServices.received(req, res);
+  }
+
   delete(req: Request, res: Response) {
     CartServices.delete(req, res);
   }

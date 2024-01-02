@@ -74,7 +74,7 @@ export default new (class CartServices {
       cartsToDeliver.forEach((cart) => {
         cart.delivered = true;
       });
-      
+
       await this.cartRepository.save(cartsToDeliver);
 
       return res.status(200).json({
@@ -88,6 +88,35 @@ export default new (class CartServices {
       });
     }
   }
+
+  async received(req: Request, res: Response) {
+    try {
+      const id = req.body.id;
+      const cart = await this.cartRepository.findOne({
+        where: { id: id },
+      });
+
+      if (!cart) {
+        return res.status(404).json({
+          message: "Pesanan tidak ditemukan",
+        });
+      }
+
+      cart.received = true;
+
+      await this.cartRepository.save(cart);
+      return res.status(200).json({
+        message: "Pesanan berhasil diterima",
+        cart: cart,
+      })
+    } catch (error) {
+      return res.status(500).json({
+        error: error,
+        message: "Terjadi kesalahan saat melakukan received",
+      });
+    }
+  }
+
   async checkout(req: Request, res: Response) {
     try {
       const cartIds: number[] = req.body.cartIds;
@@ -105,7 +134,7 @@ export default new (class CartServices {
       cartsToCheckout.forEach((cart) => {
         cart.checkout = true;
       });
-      
+
       await this.cartRepository.save(cartsToCheckout);
 
       return res.status(200).json({
@@ -147,5 +176,4 @@ export default new (class CartServices {
       });
     }
   }
-
 })();

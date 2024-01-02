@@ -34,6 +34,7 @@ router.post(
 );
 router.patch("/cart", CartController.checkout);
 router.patch("/cart/deliver", CartController.deliver);
+router.patch("/cart/received", CartController.received);
 router.delete("/cart", CartController.delete);
 
 export default router;
